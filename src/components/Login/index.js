@@ -1,20 +1,22 @@
 import React from "react";
 import { Row, Col, Typography, Button } from "antd";
-import { auth, db } from "../../firebase/config";
+import { auth } from "../../firebase/config";
 import {
   signInWithPopup,
   FacebookAuthProvider,
   getAdditionalUserInfo,
+  GoogleAuthProvider,
 } from "firebase/auth";
 import { addDocument, generateKeywords } from "../../firebase/services";
 
 const { Title } = Typography;
 
 const fbProvider = new FacebookAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 
 export default function Login() {
-  const handleFbLogin = async () => {
-    await signInWithPopup(auth, fbProvider)
+  const handleLogin = async (provider) => {
+    await signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
         const data = getAdditionalUserInfo(result);
@@ -25,7 +27,7 @@ export default function Login() {
             photoURL: user.photoURL,
             uid: user.uid,
             providerId: user.providerId,
-            keywords: generateKeywords(user.displayName),
+            keywords: generateKeywords(user.displayName?.toLowerCase()),
           });
         }
       })
@@ -38,10 +40,16 @@ export default function Login() {
           <Title style={{ textAlign: "center" }} level={3}>
             Chat App
           </Title>
-          <Button style={{ width: "100%", marginBottom: 5 }}>
+          <Button
+            style={{ width: "100%", marginBottom: 5 }}
+            onClick={() => handleLogin(googleProvider)}
+          >
             Đăng nhập bằng Google
           </Button>
-          <Button style={{ width: "100%" }} onClick={handleFbLogin}>
+          <Button
+            style={{ width: "100%" }}
+            onClick={() => handleLogin(fbProvider)}
+          >
             Đăng nhập bằng Facebook
           </Button>
         </Col>

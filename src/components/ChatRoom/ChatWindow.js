@@ -1,6 +1,6 @@
 import { UserAddOutlined } from "@ant-design/icons";
 import { Avatar, Button, Input, Tooltip, Form, Alert } from "antd";
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { AppContext } from "../../Context/AppProvider";
 import { AuthContext } from "../../Context/AuthProvider";
@@ -78,6 +78,8 @@ export default function ChatWindow() {
   } = useContext(AuthContext);
   const [inputValue, setInputValue] = useState("");
   const [form] = Form.useForm();
+  const inputRef = useRef(null);
+  const messageListRef = useRef(null);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -92,6 +94,12 @@ export default function ChatWindow() {
       displayName,
     });
     form.resetFields(["message"]);
+
+    if (inputRef?.current) {
+      setTimeout(() => {
+        inputRef.current.focus();
+      });
+    }
   };
 
   const messagesCondition = useMemo(() => {
@@ -101,7 +109,15 @@ export default function ChatWindow() {
       compareValue: selectedRoom.id,
     };
   }, [selectedRoom.id]);
+
   const messages = useFirestore("messages", messagesCondition);
+
+  useEffect(() => {
+    if (messageListRef?.current) {
+      messageListRef.current.scrollTop =
+        messageListRef.current.scrollHeight + 50;
+    }
+  }, [messages]);
 
   return (
     <WrapperStyled>
@@ -136,7 +152,7 @@ export default function ChatWindow() {
             </ButtonGroupStyled>
           </HeaderStyled>
           <ContentStyled>
-            <MessageListStyled>
+            <MessageListStyled ref={messageListRef}>
               {messages.map((mess) => (
                 <Message
                   key={mess.id}
@@ -155,6 +171,7 @@ export default function ChatWindow() {
                   placeholder="Nhập tin nhắn..."
                   bordered={false}
                   autoComplete="off"
+                  ref={inputRef}
                 />
               </Form.Item>
               <Button type="primary" onClick={handleOnSubmit}>

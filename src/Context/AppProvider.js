@@ -25,11 +25,14 @@ export default function AppProvider({ children }) {
       compareValue: uid,
     };
   }, [uid]);
+
   const rooms = useFirestore("rooms", roomsCondition);
+
   const selectedRoom = useMemo(
     () => rooms.find((room) => room.id === selectedRoomID) || {},
     [rooms, selectedRoomID]
   );
+
   const usersCondition = useMemo(() => {
     return {
       fieldName: "uid",
@@ -38,6 +41,7 @@ export default function AppProvider({ children }) {
     };
   }, [selectedRoom.members]);
   const members = useFirestore("users", usersCondition);
+
   return (
     <AppContext.Provider
       value={{

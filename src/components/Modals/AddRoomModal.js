@@ -1,5 +1,5 @@
 import { Form, Input, Modal } from "antd";
-import React, { useContext } from "react";
+import React, { createRef, useContext } from "react";
 import { AppContext } from "../../Context/AppProvider";
 import { AuthContext } from "../../Context/AuthProvider";
 import { addDocument } from "../../firebase/services";
@@ -10,6 +10,7 @@ export default function AddRoomModal() {
     user: { uid },
   } = useContext(AuthContext);
   const [form] = Form.useForm();
+
   const handleOk = () => {
     // add new room to firestore
     addDocument("rooms", { ...form.getFieldValue(), members: [uid] });
@@ -17,6 +18,7 @@ export default function AddRoomModal() {
     form.resetFields();
     setIsAddRoomVisible(false);
   };
+
   const handleCancel = () => {
     // reset form value
     form.resetFields();

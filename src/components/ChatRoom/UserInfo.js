@@ -26,7 +26,7 @@ export default function UserInfo() {
     <WrapperStyled>
       <div>
         <Avatar src={photoURL}>
-          {photoURL ? "" : displayName?.charAt[0]?.toUpperCase()}
+          {photoURL ? "" : displayName?.charAt(0)?.toUpperCase()}
         </Avatar>
         <Typography.Text className="username">{displayName}</Typography.Text>
       </div>

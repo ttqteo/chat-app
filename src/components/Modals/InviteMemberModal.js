@@ -22,7 +22,7 @@ function DebounceSelect({ fetchOptions, debounceTimeout = 300, ...props }) {
     const loadOptions = (value) => {
       setOptions([]);
       setFetching(true);
-      fetchOptions(value, props.curMembers).then((newOptions) => {
+      fetchOptions(value, props.curmembers).then((newOptions) => {
         setOptions(newOptions);
         setFetching(false);
       });
@@ -37,26 +37,28 @@ function DebounceSelect({ fetchOptions, debounceTimeout = 300, ...props }) {
   }, []);
 
   return (
-    <Select
-      labelInValue
-      filterOption={false}
-      onSearch={debounceFetcher}
-      notFoundContent={fetching ? <Spin size="small" /> : null}
-      {...props}
-    >
-      {options.map((opt) => (
-        <Select.Option key={opt.value} value={opt.value} title={opt.label}>
-          <Avatar size="small" src={opt.photoURL}>
-            {opt.photoURL ? "" : opt.label?.charAt(0)?.toUpperCase()}
-          </Avatar>
-          {`${opt.label}`}
-        </Select.Option>
-      ))}
-    </Select>
+    <>
+      <Select
+        labelInValue
+        filterOption={false}
+        onSearch={debounceFetcher}
+        notFoundContent={fetching ? <Spin size="small" /> : null}
+        {...props}
+      >
+        {options.map((opt) => (
+          <Select.Option key={opt.value} value={opt.value} title={opt.label}>
+            <Avatar size="small" src={opt.photoURL}>
+              {opt.photoURL ? "" : opt.label?.charAt(0)?.toUpperCase()}
+            </Avatar>
+            {`${opt.label}`}
+          </Select.Option>
+        ))}
+      </Select>
+    </>
   );
 }
 
-async function fetchUserList(search, curMembers) {
+async function fetchUserList(search, curmembers) {
   return getDocs(
     query(
       collection(db, "users"),
@@ -71,7 +73,7 @@ async function fetchUserList(search, curMembers) {
         value: doc.data().uid,
         photoURL: doc.data().photoURL,
       }))
-      .filter((opt) => curMembers.includes(opt.value));
+      .filter((opt) => !curmembers.includes(opt.value));
   });
 }
 
@@ -84,6 +86,7 @@ export default function InviteMemberModal() {
   } = useContext(AppContext);
   const [value, setValue] = useState([]);
   const [form] = Form.useForm();
+
   const handleOk = () => {
     form.resetFields();
     setValue([]);
@@ -94,6 +97,7 @@ export default function InviteMemberModal() {
     });
     setIsInviteMemberVisible(false);
   };
+
   const handleCancel = () => {
     form.resetFields();
     setValue([]);
@@ -107,6 +111,7 @@ export default function InviteMemberModal() {
         visible={isInviteMemberVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        destroyOnClose={true}
       >
         <Form form={form} layout="vertical">
           <DebounceSelect
@@ -117,7 +122,7 @@ export default function InviteMemberModal() {
             fetchOptions={fetchUserList}
             onChange={(newValue) => setValue(newValue)}
             style={{ width: "100%" }}
-            curMembers={selectedRoom.members}
+            curmembers={selectedRoom.members}
           />
         </Form>
       </Modal>
