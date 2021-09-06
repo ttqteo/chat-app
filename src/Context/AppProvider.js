@@ -40,7 +40,14 @@ export default function AppProvider({ children }) {
       compareValue: selectedRoom.members,
     };
   }, [selectedRoom.members]);
+
   const members = useFirestore("users", usersCondition);
+
+  const clearState = () => {
+    setSelectedRoomID("");
+    setIsAddRoomVisible(false);
+    setIsInviteMemberVisible(false);
+  };
 
   return (
     <AppContext.Provider
@@ -54,6 +61,7 @@ export default function AppProvider({ children }) {
         setSelectedRoomID,
         isInviteMemberVisible,
         setIsInviteMemberVisible,
+        clearState,
       }}
     >
       {children}

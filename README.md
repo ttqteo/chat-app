@@ -1,7 +1,7 @@
 when start with SSL https
 ($env:HTTPS = "true") -and (npm start)
 
-Start firebase emulators 
+Start firebase emulators (offline)
 firebase emulators:start
 
 # Getting Started with Create React App
